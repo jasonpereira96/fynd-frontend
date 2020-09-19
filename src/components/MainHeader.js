@@ -15,6 +15,7 @@ class MainHeader extends React.Component {
     constructor(props) {
         super(props);
         this.onPasswordSubmit = this.onPasswordSubmit.bind(this);
+        this.onPasswordKeyPress = this.onPasswordKeyPress.bind(this);
         this.onGenreSumbit = this.onGenreSumbit.bind(this);
     }
 
@@ -28,7 +29,7 @@ class MainHeader extends React.Component {
             var passwordField = <>
                 <TextField type='text' id='username-input' placeholder='Username'></TextField>
             &nbsp; &nbsp;
-                <TextField type='password' id='password-input' placeholder='Password'></TextField>
+                <TextField type='password' id='password-input' placeholder='Password' onKeyPress={(e) => this.onPasswordKeyPress(e)}></TextField>
             &nbsp; &nbsp; &nbsp; &nbsp;
                 <Button color='primary' variant='contained' onClick={this.onPasswordSubmit}>Go</Button>
             </>;
@@ -65,7 +66,13 @@ class MainHeader extends React.Component {
     }
 
     onGenreSumbit() {
-        
+
+    }
+
+    onPasswordKeyPress(e) {
+        if (e.key === 'Enter') {
+            this.onPasswordSubmit();
+        }
     }
 
     getGenreField() {

@@ -127,11 +127,13 @@ class MainScreen extends React.Component {
                 dataSource.deleteRecord(recordId);
             });
             var toDelete = new Set(deleted);
+            let newData = this.originalData.filter(record => !toDelete.has(record.id));
+            this.originalData = newData.slice();
+            newData = this.runThroughFilters(newData);
             this.setState({
-                data: this.state.data.filter(record => !toDelete.has(record.id))
+                data: newData
             });
-            this.originalData = this.originalData.filter(record => !toDelete.has(record.id));
-            console.log(`record deleted: IDS: ${JSON.stringify(deleted)}`);
+            console.log(`record deleted: IDs: ${JSON.stringify(deleted)}`);
         }
         if (added) {
             for (var record of added) {
@@ -139,10 +141,13 @@ class MainScreen extends React.Component {
                 if (isValid) {
                     dataSource.addRecord(record).then(id => {
                         record.id = id;
+                        let newData = this.originalData.concat(record);
+                        this.originalData = newData.slice();
+                        newData = this.runThroughFilters(newData);
+
                         this.setState({
-                            data: this.state.data.concat(record)
+                            data: newData
                         });
-                        this.originalData = this.originalData.concat(record);
                         console.log(`record added; ID: ${id}`);
                     });
                 } else {
@@ -151,24 +156,30 @@ class MainScreen extends React.Component {
             }
         }
         if (changed) {
-            for (var recordId of Object.keys(changed)) {
+            for (var _recordId of Object.keys(changed)) {
+                let recordId = parseInt(_recordId);
                 var record = changed[recordId];
                 var isValid = this.validateChanged(record);
-                dataSource.updateRecord(recordId, record).then((updateRecord) => {
-                    var newData = this.state.data.slice();
-                    for (var index = 0; index < this.state.data.length; index++) {
-                        var record = this.state.data[index];
-                        if (recordId === record.id) {
-                            newData[index] = updateRecord;
-                            break;
+                if (isValid) {
+                    dataSource.updateRecord(recordId, record).then((updatedRecord) => {
+                        var newData = this.originalData.slice();
+                        for (var index = 0; index < this.originalData.length; index++) {
+                            var record = this.originalData[index];
+                            if (recordId === record.id) {
+                                newData[index] = updatedRecord;
+                                break;
+                            }
                         }
-                    }
-                    this.setState({
-                        data: newData
+                        this.originalData = newData.slice();
+                        newData = this.runThroughFilters(newData);
+                        this.setState({
+                            data: newData
+                        });
+                        console.log(`record changed; ID: ${recordId}`);
                     });
-                    this.originalData = newData.slice();
-                    console.log(`record changed; ID: ${recordId}`);
-                });
+                } else {
+                    console.log('invalid');
+                }
             }
         }
     }
@@ -223,6 +234,22 @@ class MainScreen extends React.Component {
                 return false;
             }
         }
+        return true;
+    }
+    runThroughFilters(data) {
+        var d = [...data];
+        var { chipsFilters, searchFilter } = this.state;
+        var appliedChipFilters = new Set();
+
+        chipsFilters.forEach(filter => {
+            if (filter.applied) {
+                appliedChipFilters.add(filter.value);
+            }
+        });
+
+        data = data.filter(record => record.genre.some(genre => appliedChipFilters.has(genre)));
+        data = data.filter(record => record.name.includes(searchFilter) || record.director.includes(searchFilter));
+        return data;
     }
 }
 

@@ -2751,13 +2751,24 @@ class DataSource {
             id: recordId,
             name: fields.name || 'Mr. X',
             director: fields.director || 'Jason',
-            genres: fields.genres || ['Action'],
+            genres: fields.genres || 'Action',
+            genre: fields.genre || ['Action'],
             imdb_score: fields.imdb_score || 6.8,
             popularity: fields.popularity || 68
         };
         return new Promise(function (resolve, reject) {
             resolve(ur);
         });
+        /*
+        99popularity: 88
+        director: "George Lucas"
+        genre: (4) ["Action", "Adventure", "Fantasy", "Sci-Fi"]
+        genres: "Action, Adventure, Fantasy, Sci-Fi"
+        id: 1
+        imdb_score: 8.8
+        name: "Star Wars"
+        popularity: 88
+        */
     }
     verifyCredentials({ username, password }) {
         return new Promise(function (resolve, reject) {

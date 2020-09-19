@@ -217,6 +217,15 @@ class MainGrid extends React.Component {
                 actions.deleted[index] = this.props.data[rowNumber].id;
             }
         }
+        if (actions.changed) {
+            let map = {};
+            for (var _rowNumber of Object.keys(actions.changed)) {
+                let rowNumber = parseInt(_rowNumber);
+                let recordId = this.props.data[rowNumber].id;
+                map[recordId] = actions.changed[_rowNumber];
+            }
+            actions.changed = map;
+        }
         this.props.onDataEdit(actions);
     }
 
