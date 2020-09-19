@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family:  'Roboto', sans-serif;
 }
 #root {
   height: 100%;
@@ -7,18 +8,30 @@
 }
 
 .main-header {
-  background-color: #ff7f50;
-  color: white;
+  background-color: white;
+  color: black;
 }
 .main-header ul {
-  background-color: #ff7f50;
+  background-color: white;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.heading {
+  display: flex;
+  flex-direction: row;
+}
+#admin-button-div {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+.heading > div {
+  flex: 1;
+}
+a:-webkit-any-link {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+h3 {
+  padding-top: 15px;
 }

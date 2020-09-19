@@ -16,7 +16,7 @@ class MainScreen extends React.Component {
         };
 
         const DEBOUNCE_DELAY = 400;
-        
+
         this.chipClicked = this.chipClicked.bind(this);
         this.filterChanged =  this.filterChanged.bind(this);
         this.onSearch = debounce(this.onSearch, DEBOUNCE_DELAY);
@@ -39,9 +39,9 @@ class MainScreen extends React.Component {
     render() {
         return <div className='main-screen'>
             <MainHeader chipClicked={this.chipClicked} 
-                chipsFilters={this.state.chipsFilters} onSearch={this.onSearch}>    
+                chipsFilters={this.state.chipsFilters} onSearch={this.onSearch} isAdmin={this.props.isAdmin}>    
             </MainHeader>
-            <MainGrid data={this.state.data}></MainGrid>
+            <MainGrid data={this.state.data} isAdmin={this.props.isAdmin}></MainGrid>
         </div>
     }
     chipClicked(chip) {

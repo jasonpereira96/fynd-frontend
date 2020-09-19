@@ -18,10 +18,10 @@ function App() {
             renders the first one that matches the current URL. */}
 					<Switch>
 						<Route path="/admin">
-							<AdminScreen />
+							<MainScreen isAdmin={true}/>
 						</Route>
 						<Route path="/">
-							<MainScreen />
+							<MainScreen isAdmin={false}/>
 						</Route>
 					</Switch>
 				</div>
