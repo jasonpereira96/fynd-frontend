@@ -100,13 +100,18 @@ class MainScreen extends React.Component {
             data: filteredData
         });
     }
-    onPasswordSubmit(password) {
-        console.log('password: ' + password);
-        if (password === 'admin') {
-            this.setState({
-                verified: true
-            });
-        }
+    onPasswordSubmit(username, password) {
+        console.log('username: ' + username + ' password: ' + password);
+        var dataSource = new DataSource();
+        dataSource.verifyCredentials({
+            username, password
+        }).then(({ valid }) => {
+            if (valid) {
+                this.setState({
+                    verified: true
+                });
+            }
+        });
     }
     componentDidUpdate(prevProps, prevState) {
         if (prevState.searchFilter !== this.state.searchFilter || prevState.chipsFilters !== this.state.chipsFilters) {
@@ -187,7 +192,37 @@ class MainScreen extends React.Component {
         return true;
     }
     validateChanged(record) {
-        return true;
+        if (record.name !== undefined) {
+            if (record.name === '') {
+                return false;
+            }
+        }
+        if (record.director !== undefined) {
+            if (record.director === '') {
+                return false;
+            }
+        }
+        if (record.genres !== undefined) {
+            if (!Array.isArray(record.genres) || record.genres.length === 0) {
+                return false;
+            }
+        }
+        if (record.popularity !== undefined) {
+            if (record.popularity === '') {
+                return false;
+            }
+            if (isNaN(parseFloat(record.popularity))) {
+                return false;
+            }
+        }
+        if (record.imdb_score !== undefined) {
+            if (record.imdb_score === '') {
+                return false;
+            }
+            if (isNaN(parseFloat(record.imdb_score))) {
+                return false;
+            }
+        }
     }
 }
 

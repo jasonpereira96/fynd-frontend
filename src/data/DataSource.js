@@ -2715,7 +2715,7 @@ class DataSource {
                 ...record
             };
         });
-        r = r.filter((r,index) => index < 4);
+        r = r.filter((r, index) => index < 4);
         return new Promise(function (resolve, reject) {
             resolve(r);
         })
@@ -2755,8 +2755,28 @@ class DataSource {
             imdb_score: fields.imdb_score || 6.8,
             popularity: fields.popularity || 68
         };
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             resolve(ur);
+        });
+    }
+    verifyCredentials({ username, password }) {
+        return new Promise(function (resolve, reject) {
+            if (username === 'admin' && password === 'admin') {
+                resolve({ valid: true });
+            } else {
+                resolve({ valid: false });
+            }
+        });
+    }
+    addGenre(genre) {
+        return new Promise(function (resolve, reject) {
+            if (!genre) {
+                reject('invalid genre:  cannot be empty');
+            } else {
+                resolve({
+                    result: 'genre added'
+                });
+            }
         });
     }
 }

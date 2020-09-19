@@ -30,10 +30,16 @@ import Checkbox from '@material-ui/core/Checkbox';
 import {
     DataTypeProvider
 } from '@devexpress/dx-react-grid';
-import DataSource from '../data/DataSource';
 
 const GenreFormatter = ({ value }) => {
-    var genres = value.split(', ');
+    var genres;
+    if (!value) {
+        genres = [];
+    } else if (!Array.isArray(value)) {
+        genres = value.split(', ');
+    } else if (Array.isArray(value)) {
+        genres = value;
+    }
     var chips = genres.map(function (genre, index) {
         return (<Chip label={genre} key={index} />);
     });
@@ -119,6 +125,12 @@ class MainGrid extends React.Component {
             name: 'popularity', title: 'Popularity'
         }];
 
+        let editingColumnExtensions = [{
+            columnName: 'name', editingEnabled: false
+        }, {
+            columnName: 'id', editingEnabled: false
+        }];
+
         if (isAdmin) {
 
             tableEditRow = <TableEditRow />;
@@ -130,6 +142,7 @@ class MainGrid extends React.Component {
             editingState = <EditingState
                 onCommitChanges={this.onDataEdit}
                 getRowId={getRowId}
+                columnExtensions={editingColumnExtensions}
             />;
         }
 
@@ -196,7 +209,7 @@ class MainGrid extends React.Component {
             filters: filters
         });
     }
-    
+
     onDataEdit(actions) {
         if (actions.deleted) {
             for (var index = 0; index < actions.deleted.length; index++) {
