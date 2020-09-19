@@ -2707,7 +2707,7 @@ class DataSource {
                 "name": "Charlies Angels"
             }
         ];
-        return json.map((record, index) => {
+        var r = json.map((record, index) => {
             return {
                 id: index,
                 genres: record.genre.join(', '),
@@ -2715,9 +2715,13 @@ class DataSource {
                 ...record
             };
         });
+        r = r.filter((r,index) => index < 4);
+        return new Promise(function (resolve, reject) {
+            resolve(r);
+        })
     }
     getGenres() {
-        var g =  [
+        var g = [
             'Adventure', 'Family', 'Fantasy',
             'Musical', 'Action', 'Sci-Fi',
             'Drama', 'War', 'Horror',
@@ -2730,7 +2734,30 @@ class DataSource {
             'Reality-TV'
         ];
         g.sort();
-        return g;
+        return new Promise(function (resolve, reject) {
+            resolve(g);
+        });
+    }
+    deleteRecord(recordId) {
+
+    }
+    addRecord(record) {
+        return new Promise(function (resolve, reject) {
+            resolve(3000);
+        });
+    }
+    updateRecord(recordId, fields) {
+        var ur = {
+            id: recordId,
+            name: fields.name || 'Mr. X',
+            director: fields.director || 'Jason',
+            genres: fields.genres || ['Action'],
+            imdb_score: fields.imdb_score || 6.8,
+            popularity: fields.popularity || 68
+        };
+        return new Promise(function(resolve, reject) {
+            resolve(ur);
+        });
     }
 }
 

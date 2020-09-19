@@ -27,10 +27,10 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Checkbox from '@material-ui/core/Checkbox';
-import Box from '@material-ui/core/Box';
 import {
     DataTypeProvider
 } from '@devexpress/dx-react-grid';
+import DataSource from '../data/DataSource';
 
 const GenreFormatter = ({ value }) => {
     var genres = value.split(', ');
@@ -40,32 +40,40 @@ const GenreFormatter = ({ value }) => {
     return chips;
 };
 
-const GenreEditor = ({ value, onValueChange }) => {
-    value = value.split(', ');
+function GenreEditor({ value, onValueChange }) {
+    if (!value) {
+        value = [];
+    } else if (!Array.isArray(value)) {
+        value = value.split(', ');
+    }
+    var currentGenres = new Set(value);
+    var grid = this;
+    var genres = grid.props.genres;
     return <Select
         input={<Input />}
         value={value}
-        // onChange={event => onValueChange(event.target.value === 'Yes')}
+        onChange={event => onValueChange(event.target.value)}
         multiple
         style={{ width: '100%' }}
         renderValue={(selected) => selected.join(', ')}
     >
-        {value.map((name) => (
-            <MenuItem key={name} value={name}>
-                <Checkbox checked={true} />
+        {genres.map((genre) => (
+            <MenuItem key={genre} value={genre}>
+                <Checkbox checked={currentGenres.has(genre)} />
                 {/* <Checkbox checked={personName.indexOf(name) > -1} /> */}
-                <ListItemText primary={name} />
+                <ListItemText primary={genre} />
             </MenuItem>
         ))}
     </Select>;
 };
-const GenreTypeProvider = props => (
-    <DataTypeProvider
-        formatterComponent={GenreFormatter}
-        editorComponent={GenreEditor}
+function GenreTypeProvider(props) {
+    var { grid } = props;
+    return (<DataTypeProvider
+        formatterComponent={GenreFormatter.bind(grid)}
+        editorComponent={GenreEditor.bind(grid)}
         {...props}
-    />
-);
+    />);
+};
 
 const chipColumns = ['genres'];
 
@@ -88,6 +96,7 @@ class MainGrid extends React.Component {
         this.setLoading = this.setLoading.bind(this);
         this.setLastQuery = this.setLastQuery.bind(this);
         this.getCommitChanges = this.getCommitChanges.bind(this);
+        this.onDataEdit = this.onDataEdit.bind(this);
     }
 
     render() {
@@ -96,9 +105,9 @@ class MainGrid extends React.Component {
         let tableEditRow = <></>, tableEditColumn = <></>;
         const getRowId = row => row.id;
 
-        columns = [/*{
+        columns = [{
             name: 'id', title: 'ID'
-        }, */{
+        }, {
             name: 'name', title: 'Name'
         }, {
             name: 'director', title: 'Director'
@@ -119,7 +128,7 @@ class MainGrid extends React.Component {
                 showDeleteCommand
             />;
             editingState = <EditingState
-                onCommitChanges={this.getCommitChanges()}
+                onCommitChanges={this.onDataEdit}
                 getRowId={getRowId}
             />;
         }
@@ -149,12 +158,13 @@ class MainGrid extends React.Component {
                     >
                         <GenreTypeProvider
                             for={chipColumns}
+                            grid={this}
                         />
                         {editingState}
                         <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
                         <IntegratedSorting />
-                        <Table/>
-                        <VirtualTable columnExtensions={columnExtensions}/>
+                        <Table />
+                        <VirtualTable columnExtensions={columnExtensions} />
                         <TableHeaderRow showSortingControls />
                         {tableEditRow}
                         {tableEditColumn}
@@ -186,15 +196,23 @@ class MainGrid extends React.Component {
             filters: filters
         });
     }
-    getURL() {
-        let { serverHostname } = this.props;
-        return `http://${serverHostname}/data`;
+    
+    onDataEdit(actions) {
+        if (actions.deleted) {
+            for (var index = 0; index < actions.deleted.length; index++) {
+                var rowNumber = actions.deleted[index];
+                actions.deleted[index] = this.props.data[rowNumber].id;
+            }
+        }
+        this.props.onDataEdit(actions);
     }
 
     getCommitChanges() {
         let { setRows } = this;
         let { rows } = this.state;
         const commitChanges = ({ added, changed, deleted }) => {
+
+
             let changedRows;
             if (added) {
                 const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;

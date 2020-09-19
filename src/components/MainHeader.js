@@ -11,18 +11,18 @@ import {
 import Typography from '@material-ui/core/Typography';
 
 class MainHeader extends React.Component {
-    
+
     render() {
         var { onSearch } = this.props;
         var { isAdmin } = this.props;
-
+        var { verified } = this.props;
         if (isAdmin) {
             var thirdDiv = <div id='admin-button-div'></div>;
 
             var passwordField = <>
-            <TextField type='password' id='password-input' placeholder='Password'></TextField>
+                <TextField type='password' id='password-input' placeholder='Password'></TextField>
             &nbsp; &nbsp; &nbsp; &nbsp;
-            <Button color='primary' variant='contained' onClick={this.onPasswordSubmit.bind(this)}>Go</Button>
+                <Button color='primary' variant='contained' onClick={this.onPasswordSubmit.bind(this)}>Go</Button>
             </>
         } else {
             var thirdDiv = <div id='admin-button-div'>
@@ -39,9 +39,9 @@ class MainHeader extends React.Component {
                     {thirdDiv}
                 </div>
                 <div>
-                {passwordField}
+                    {passwordField}
                 </div>
-                <br/>
+                <br />
                 <TextField type='text' id='search-input' onChange={(e, data) => { onSearch(e, e.target.value + '') }}
                     placeholder='Search...'
                 ></TextField>
