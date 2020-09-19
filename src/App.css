@@ -1,7 +1,8 @@
 .App {
   text-align: center;
-  font-family:  'Roboto', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
+
 #root {
   height: 100%;
   width: 100%;
@@ -11,27 +12,38 @@
   background-color: white;
   color: black;
 }
+
 .main-header ul {
   background-color: white;
 }
+
 .heading {
   display: flex;
   flex-direction: row;
 }
+
 #admin-button-div {
   display: flex;
   justify-content: center;
   padding-bottom: 15px;
   padding-top: 15px;
 }
-.heading > div {
+
+.heading>div {
   flex: 1;
 }
+
 a:-webkit-any-link {
   color: inherit;
   cursor: pointer;
   text-decoration: none;
 }
+
 h3 {
   padding-top: 15px;
+}
+
+.MuiTableCell-root.MuiTableCell-body  {
+  padding-bottom: 2em;
+  padding-top: 2em;
 }

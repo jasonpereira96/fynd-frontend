@@ -12,7 +12,7 @@ import {
     TableFilterRow,
 } from '@devexpress/dx-react-grid-material-ui';
 import { IntegratedSorting, SortingState } from '@devexpress/dx-react-grid';
-import { LinearProgress } from '@material-ui/core';
+import { LinearProgress, Popover } from '@material-ui/core';
 import {
     SummaryState,
     IntegratedSummary,
@@ -21,6 +21,54 @@ import {
     TableSummaryRow,
 } from '@devexpress/dx-react-grid-material-ui';
 import { VirtualTable } from '@devexpress/dx-react-grid-material-ui';
+import Chip from '@material-ui/core/Chip';
+import Input from '@material-ui/core/Input';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from '@material-ui/core/Checkbox';
+import Box from '@material-ui/core/Box';
+import {
+    DataTypeProvider
+} from '@devexpress/dx-react-grid';
+
+const GenreFormatter = ({ value }) => {
+    var genres = value.split(', ');
+    var chips = genres.map(function (genre, index) {
+        return (<Chip label={genre} key={index} />);
+    });
+    return chips;
+};
+
+const GenreEditor = ({ value, onValueChange }) => {
+    value = value.split(', ');
+    return <Select
+        input={<Input />}
+        value={value}
+        // onChange={event => onValueChange(event.target.value === 'Yes')}
+        multiple
+        style={{ width: '100%' }}
+        renderValue={(selected) => selected.join(', ')}
+    >
+        {value.map((name) => (
+            <MenuItem key={name} value={name}>
+                <Checkbox checked={true} />
+                {/* <Checkbox checked={personName.indexOf(name) > -1} /> */}
+                <ListItemText primary={name} />
+            </MenuItem>
+        ))}
+    </Select>;
+};
+const GenreTypeProvider = props => (
+    <DataTypeProvider
+        formatterComponent={GenreFormatter}
+        editorComponent={GenreEditor}
+        {...props}
+    />
+);
+
+const chipColumns = ['genres'];
+
 
 class MainGrid extends React.Component {
 
@@ -48,9 +96,9 @@ class MainGrid extends React.Component {
         let tableEditRow = <></>, tableEditColumn = <></>;
         const getRowId = row => row.id;
 
-        columns = [{
+        columns = [/*{
             name: 'id', title: 'ID'
-        }, {
+        }, */{
             name: 'name', title: 'Name'
         }, {
             name: 'director', title: 'Director'
@@ -63,9 +111,6 @@ class MainGrid extends React.Component {
         }];
 
         if (isAdmin) {
-            columns.push({
-                name: 'popularity2', title: 'Popularity2'
-            });
 
             tableEditRow = <TableEditRow />;
             tableEditColumn = <TableEditColumn
@@ -89,6 +134,11 @@ class MainGrid extends React.Component {
             }
         }
 
+        var columnExtensions = [{
+            columnName: 'genres',
+            wordWrapEnabled: true
+        }];
+
 
         return (
             <div className="datagrid">
@@ -97,11 +147,14 @@ class MainGrid extends React.Component {
                         rows={rows}
                         columns={columns}
                     >
+                        <GenreTypeProvider
+                            for={chipColumns}
+                        />
                         {editingState}
                         <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
                         <IntegratedSorting />
-                        <Table />
-                        <VirtualTable />
+                        <Table/>
+                        <VirtualTable columnExtensions={columnExtensions}/>
                         <TableHeaderRow showSortingControls />
                         {tableEditRow}
                         {tableEditColumn}
