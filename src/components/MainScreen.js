@@ -2,7 +2,7 @@ import React from 'react';
 import MainGrid from './MainGrid';
 import MainHeader from './MainHeader';
 import DataSource from './../data/DataSource';
-import {debounce} from './../utils/utils';
+import { debounce } from './../utils/utils';
 
 
 class MainScreen extends React.Component {
@@ -12,13 +12,16 @@ class MainScreen extends React.Component {
         this.state = {
             chipsFilters: [],
             searchFilter: '',
-            data: []
+            data: [],
+            originalData: [],
+            verified: false
         };
 
         const DEBOUNCE_DELAY = 400;
 
         this.chipClicked = this.chipClicked.bind(this);
-        this.filterChanged =  this.filterChanged.bind(this);
+        this.filterChanged = this.filterChanged.bind(this);
+        this.onPasswordSubmit = this.onPasswordSubmit.bind(this);
         this.onSearch = debounce(this.onSearch, DEBOUNCE_DELAY);
         this.onSearch = this.onSearch.bind(this);
     }
@@ -27,6 +30,7 @@ class MainScreen extends React.Component {
         var data = dataSource.getData();
         var genres = dataSource.getGenres();
         this.originalData = data.slice();
+
         this.setState({
             data: data,
             chipsFilters: genres.map((genre, index) => {
@@ -38,10 +42,11 @@ class MainScreen extends React.Component {
     }
     render() {
         return <div className='main-screen'>
-            <MainHeader chipClicked={this.chipClicked} 
-                chipsFilters={this.state.chipsFilters} onSearch={this.onSearch} isAdmin={this.props.isAdmin}>    
+            <MainHeader chipClicked={this.chipClicked}
+                chipsFilters={this.state.chipsFilters} onSearch={this.onSearch} isAdmin={this.props.isAdmin}
+                onPasswordSubmit={this.onPasswordSubmit}>
             </MainHeader>
-            <MainGrid data={this.state.data} isAdmin={this.props.isAdmin}></MainGrid>
+            <MainGrid data={this.state.data} isAdmin={this.props.isAdmin} verified={this.state.verified}></MainGrid>
         </div>
     }
     chipClicked(chip) {
@@ -73,7 +78,7 @@ class MainScreen extends React.Component {
         var appliedChipFilters = chipsFilters.filter(filter => filter.applied);
 
         filteredData = filteredData.filter(record => {
-            return record.name.toLowerCase().includes(searchFilter.toLowerCase()) || 
+            return record.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
                 record.director.toLowerCase().includes(searchFilter.toLowerCase());
         });
         if (appliedChipFilters.length > 0) {
@@ -90,11 +95,19 @@ class MainScreen extends React.Component {
             data: filteredData
         });
     }
+    onPasswordSubmit(password) {
+        console.log('password: ' + password);
+        if (password === 'admin') {
+            this.setState({
+                verified: true
+            });
+        }
+    }
     componentDidUpdate(prevProps, prevState) {
         if (prevState.searchFilter !== this.state.searchFilter || prevState.chipsFilters !== this.state.chipsFilters) {
             this.filterChanged();
         }
-    }   
+    }
 }
 
 export default MainScreen;

@@ -1,6 +1,10 @@
 import React from 'react';
 import Paper from '@material-ui/core/Paper';
-import { Grid, Table, TableHeaderRow } from '@devexpress/dx-react-grid-material-ui';
+import {
+    Grid, Table, TableHeaderRow, TableEditRow,
+    TableEditColumn
+} from '@devexpress/dx-react-grid-material-ui';
+import { EditingState } from '@devexpress/dx-react-grid';
 import {
     FilteringState,
 } from '@devexpress/dx-react-grid';
@@ -28,7 +32,6 @@ class MainGrid extends React.Component {
             rows: [],
             filters: []
         };
-        const DEBOUNCE_DELAY = 400;
 
         this.setLoading = this.setLoading.bind(this);
         this.setLastQuery = this.setLastQuery.bind(this);
@@ -36,13 +39,18 @@ class MainGrid extends React.Component {
         this.setRows = this.setRows.bind(this);
         this.setLoading = this.setLoading.bind(this);
         this.setLastQuery = this.setLastQuery.bind(this);
-        // this.loadData = debounce(this.loadData, DEBOUNCE_DELAY);
+        this.getCommitChanges = this.getCommitChanges.bind(this);
     }
 
     render() {
-        let columns = [/*{
-            name: 'id', title: 'Id'
-        },*/ {
+        let { isAdmin, verified } = this.props;
+        let columns, editingComponents = <></>, editingState = <></>;
+        let tableEditRow = <></>, tableEditColumn = <></>;
+        const getRowId = row => row.id;
+
+        columns = [{
+            name: 'id', title: 'ID'
+        }, {
             name: 'name', title: 'Name'
         }, {
             name: 'director', title: 'Director'
@@ -54,25 +62,56 @@ class MainGrid extends React.Component {
             name: 'popularity', title: 'Popularity'
         }];
 
+        if (isAdmin) {
+            columns.push({
+                name: 'popularity2', title: 'Popularity2'
+            });
+
+            tableEditRow = <TableEditRow />;
+            tableEditColumn = <TableEditColumn
+                showAddCommand={verified}
+                showEditCommand
+                showDeleteCommand
+            />;
+            editingState = <EditingState
+                onCommitChanges={this.getCommitChanges()}
+                getRowId={getRowId}
+            />;
+        }
+
+        if (!isAdmin) {
+            var rows = this.props.data;
+        } else {
+            if (verified) {
+                var rows = this.props.data;
+            } else {
+                var rows = [];
+            }
+        }
+
 
         return (
             <div className="datagrid">
                 <Paper>
                     <Grid
-                        rows={this.props.data}
-                        columns={columns}>
+                        rows={rows}
+                        columns={columns}
+                    >
+                        {editingState}
                         <SortingState defaultSorting={[{ columnName: 'id', direction: 'asc' }]} />
                         <IntegratedSorting />
                         <Table />
                         <VirtualTable />
                         <TableHeaderRow showSortingControls />
+                        {tableEditRow}
+                        {tableEditColumn}
                     </Grid>
                 </Paper>
             </div>
         );
     }
 
-    
+
 
     setLastQuery(query) {
         this.setState({
@@ -97,6 +136,33 @@ class MainGrid extends React.Component {
     getURL() {
         let { serverHostname } = this.props;
         return `http://${serverHostname}/data`;
+    }
+
+    getCommitChanges() {
+        let { setRows } = this;
+        let { rows } = this.state;
+        const commitChanges = ({ added, changed, deleted }) => {
+            let changedRows;
+            if (added) {
+                const startingAddedId = rows.length > 0 ? rows[rows.length - 1].id + 1 : 0;
+                changedRows = [
+                    ...rows,
+                    ...added.map((row, index) => ({
+                        id: startingAddedId + index,
+                        ...row,
+                    })),
+                ];
+            }
+            if (changed) {
+                changedRows = rows.map(row => (changed[row.id] ? { ...row, ...changed[row.id] } : row));
+            }
+            if (deleted) {
+                const deletedSet = new Set(deleted);
+                changedRows = rows.filter(row => !deletedSet.has(row.id));
+            }
+            setRows(changedRows);
+        };
+        return commitChanges;
     }
 
     // componentDidUpdate(prevProps) {
