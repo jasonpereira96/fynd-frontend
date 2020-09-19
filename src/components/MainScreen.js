@@ -2,6 +2,7 @@ import React from 'react';
 import MainGrid from './MainGrid';
 import MainHeader from './MainHeader';
 import DataSource from './../data/DataSource';
+import {debounce} from './../utils/utils';
 
 
 class MainScreen extends React.Component {
@@ -13,7 +14,13 @@ class MainScreen extends React.Component {
             searchFilter: '',
             data: []
         };
+
+        const DEBOUNCE_DELAY = 400;
+        
         this.chipClicked = this.chipClicked.bind(this);
+        this.filterChanged =  this.filterChanged.bind(this);
+        this.onSearch = debounce(this.onSearch, DEBOUNCE_DELAY);
+        this.onSearch = this.onSearch.bind(this);
     }
     componentDidMount() {
         var dataSource = new DataSource();
@@ -31,7 +38,9 @@ class MainScreen extends React.Component {
     }
     render() {
         return <div className='main-screen'>
-            <MainHeader chipClicked={this.chipClicked} chipsFilters={this.state.chipsFilters}></MainHeader>
+            <MainHeader chipClicked={this.chipClicked} 
+                chipsFilters={this.state.chipsFilters} onSearch={this.onSearch}>    
+            </MainHeader>
             <MainGrid data={this.state.data}></MainGrid>
         </div>
     }
@@ -47,7 +56,16 @@ class MainScreen extends React.Component {
         this.setState({
             chipsFilters
         });
-        this.filterChanged();
+        // this.filterChanged();
+    }
+    onSearch(event, data) {
+        // console.log(searchBox);
+        // event.persist();
+        var searchString = data;
+        this.setState({
+            searchFilter: searchString
+        });
+        // this.filterChanged();
     }
     filterChanged() {
         var filteredData = this.originalData.slice();
@@ -55,7 +73,8 @@ class MainScreen extends React.Component {
         var appliedChipFilters = chipsFilters.filter(filter => filter.applied);
 
         filteredData = filteredData.filter(record => {
-            return record.name.indexOf(searchFilter) !== -1 || record.director.indexOf(searchFilter) !== -1;
+            return record.name.toLowerCase().includes(searchFilter.toLowerCase()) || 
+                record.director.toLowerCase().includes(searchFilter.toLowerCase());
         });
         if (appliedChipFilters.length > 0) {
             filteredData = filteredData.filter(record => {
@@ -71,6 +90,11 @@ class MainScreen extends React.Component {
             data: filteredData
         });
     }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.searchFilter !== this.state.searchFilter || prevState.chipsFilters !== this.state.chipsFilters) {
+            this.filterChanged();
+        }
+    }   
 }
 
 export default MainScreen;
