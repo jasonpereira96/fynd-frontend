@@ -3,6 +3,7 @@ import MainGrid from './MainGrid';
 import MainHeader from './MainHeader';
 import DataSource from './../data/DataSource';
 import { debounce } from './../utils/utils';
+import ErrorHandler from './ErrorHandler';
 
 
 class MainScreen extends React.Component {
@@ -26,6 +27,7 @@ class MainScreen extends React.Component {
         this.onSearch = debounce(this.onSearch, DEBOUNCE_DELAY);
         this.onSearch = this.onSearch.bind(this);
         this.onDataEdit = this.onDataEdit.bind(this);
+        this.onGenreSubmit = this.onGenreSubmit.bind(this);
     }
     componentDidMount() {
         var dataSource = new DataSource();
@@ -47,7 +49,8 @@ class MainScreen extends React.Component {
         return <div className='main-screen'>
             <MainHeader chipClicked={this.chipClicked}
                 chipsFilters={this.state.chipsFilters} onSearch={this.onSearch} isAdmin={this.props.isAdmin}
-                onPasswordSubmit={this.onPasswordSubmit} verified={this.state.verified}>
+                onPasswordSubmit={this.onPasswordSubmit} verified={this.state.verified} onDataEdit={this.onDataEdit}
+                onGenreSubmit={this.onGenreSubmit}>
             </MainHeader>
             <MainGrid data={this.state.data} isAdmin={this.props.isAdmin} verified={this.state.verified}
                 genres={this.state.genres} onDataEdit={this.onDataEdit}
@@ -246,11 +249,35 @@ class MainScreen extends React.Component {
                 appliedChipFilters.add(filter.value);
             }
         });
-
-        data = data.filter(record => record.genre.some(genre => appliedChipFilters.has(genre)));
+        if (appliedChipFilters.size > 0) {
+            data = data.filter(record => record.genre.some(genre => appliedChipFilters.has(genre)));
+        }
         data = data.filter(record => record.name.includes(searchFilter) || record.director.includes(searchFilter));
         return data;
     }
+
+    onGenreSubmit(newGenre) {
+        var dataSource = new DataSource();
+        var me = this;
+        for (var chipFilter of this.state.chipsFilters) {
+            if (chipFilter.value === newGenre) {
+                ErrorHandler.showError('genre already exists');
+                return;
+            }
+        }
+        dataSource.addGenre(newGenre).then(result => {
+            console.log(result);
+            var currentChipFilters = this.state.chipsFilters.slice();
+            currentChipFilters.push({
+                applied: false,
+                value: newGenre,
+                key: currentChipFilters.length
+            });
+            me.setState({
+                chipsFilters: currentChipFilters
+            });
+        });
+    } 
 }
 
 export default MainScreen;

@@ -9,6 +9,8 @@ import {
     Link
 } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';
+import RowModal from './RowModal';
+import ErrorHandler from './ErrorHandler';
 
 class MainHeader extends React.Component {
 
@@ -16,7 +18,13 @@ class MainHeader extends React.Component {
         super(props);
         this.onPasswordSubmit = this.onPasswordSubmit.bind(this);
         this.onPasswordKeyPress = this.onPasswordKeyPress.bind(this);
-        this.onGenreSumbit = this.onGenreSumbit.bind(this);
+        this.onGenreSubmit = this.onGenreSubmit.bind(this);
+        this.onRowSubmit = this.onRowSubmit.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
+        this.state = {
+            modalOpen: false
+        };
     }
 
     render() {
@@ -55,7 +63,8 @@ class MainHeader extends React.Component {
                     placeholder='Search...'
                 ></TextField>
                 <ChipsArray chipClicked={this.props.chipClicked} chipsFilters={this.props.chipsFilters}></ChipsArray>
-                {this.getGenreField()}
+                {this.getProtectedInputs()}
+                {/* {modal} */}
             </div>
         )
     }
@@ -65,8 +74,14 @@ class MainHeader extends React.Component {
         this.props.onPasswordSubmit(username, password);
     }
 
-    onGenreSumbit() {
-
+    onGenreSubmit() {
+        var genreInput = document.getElementById('genre-input');
+        var newGenre = genreInput.value;
+        if (newGenre.length > 0) {
+            this.props.onGenreSubmit(newGenre);
+        } else {
+            ErrorHandler.showError('genre cannot be empty');
+        }
     }
 
     onPasswordKeyPress(e) {
@@ -75,18 +90,35 @@ class MainHeader extends React.Component {
         }
     }
 
-    getGenreField() {
-        var { verified } = this.props;
+    getProtectedInputs() {
+        var { verified, chipsFilters } = this.props;
         if (verified) {
             return <>
                 <br />
-                <TextField type='text' id='genre-input' placeholder='Add Genre'></TextField>
+                <TextField type='text' placeholder='Add Genre' inputProps={{id: 'genre-input'}}></TextField>
             &nbsp; &nbsp; &nbsp; &nbsp;
-                <Button color='primary' variant='contained' onClick={this.onGenreSumbit}>Add Genre</Button>
+                <Button color='primary' variant='contained' onClick={this.onGenreSubmit}>Add Genre</Button>
+            &nbsp; &nbsp; &nbsp; &nbsp;
+                <br/>
+                <br/>
+                <RowModal chipsFilters={chipsFilters} onRowSubmit={this.onRowSubmit}></RowModal>
             </>;
         } else {
             return <></>;
         }
+    }
+    onRowSubmit(rowInfo) {
+        console.log('row submitted');
+        console.log(rowInfo);
+        let changes = {
+            added: [rowInfo]
+        };
+        this.props.onDataEdit(changes);
+    }
+    handleClose() {
+        this.setState({
+            modalOpen: false
+        });
     }
 }
 export default MainHeader;  

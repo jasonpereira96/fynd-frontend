@@ -135,7 +135,7 @@ class MainGrid extends React.Component {
 
             tableEditRow = <TableEditRow />;
             tableEditColumn = <TableEditColumn
-                showAddCommand={verified}
+                showAddCommand={false}
                 showEditCommand
                 showDeleteCommand
             />;
@@ -222,7 +222,9 @@ class MainGrid extends React.Component {
             for (var _rowNumber of Object.keys(actions.changed)) {
                 let rowNumber = parseInt(_rowNumber);
                 let recordId = this.props.data[rowNumber].id;
-                map[recordId] = actions.changed[_rowNumber];
+                if (actions.changed[_rowNumber] !== undefined) {
+                    map[recordId] = actions.changed[_rowNumber];
+                }
             }
             actions.changed = map;
         }

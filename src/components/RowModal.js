@@ -39,11 +39,35 @@ export default function SimpleModal(props) {
     const [open, setOpen] = React.useState(false);
     const [selected, setSelected] = React.useState([]);
 
-    this.nameFieldRef = React.createRef();
-    this.directorFieldRef = React.createRef();
-    this.imdbFieldRef = React.createRef();
-    this.popularityFieldRef = React.createRef();
-    this.selectRef = React.createRef();
+    const nameFieldRef = React.createRef();
+    const directorFieldRef = React.createRef();
+    const imdbFieldRef = React.createRef();
+    const popularityFieldRef = React.createRef();
+    const selectRef = React.createRef();
+
+    function onRowSubmit() {
+        var form = document.getElementById('row-form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+        } else {
+            // console.log(nameFieldRef);
+            let nameField = document.getElementById('outlined-name');
+            let directorField = document.getElementById('outlined-director');
+            let imdbField = document.getElementById('outlined-imdb-score');
+            let popularityField = document.getElementById('outlined-popularity');
+            let select = document.getElementById('outlined-genres');
+
+            props.onRowSubmit({
+                name: nameField.value,
+                director: directorField.value,
+                imdb_score: parseFloat(imdbField.value),
+                popularity: parseFloat(popularityField.value),
+                genres: select.value.split(',')
+            });
+
+            setOpen(false);
+        }
+    }
 
 
     const handleOpen = () => {
@@ -65,21 +89,21 @@ export default function SimpleModal(props) {
         <div style={modalStyle} className={classes.paper}>
             <h2 id="simple-modal-title">New Row</h2>
             <form className={classes.root} autoComplete="off" id='row-form'>
-                <TextField id="outlined-name" label="Name" variant="outlined" required placeholder='Name' ref={this.nameFieldRef} />
+                <TextField id="outlined-name" label="Name" variant="outlined" required placeholder='Name' ref={nameFieldRef} />
                 <br />
                 <br />
-                <TextField id="outlined-director" label="Director" variant="outlined" required placeholder='Director' ref={this.directorFieldRef}/>
+                <TextField id="outlined-director" label="Director" variant="outlined" required placeholder='Director' ref={directorFieldRef}/>
                 <br />
                 <br />
-                <TextField id="outlined-imdb-score" label="IMDB Score" variant="outlined" required placeholder='IMDB Score' type='number' ref={this.imdbFieldRef}/>
+                <TextField id="outlined-imdb-score" label="IMDB Score" variant="outlined" required placeholder='IMDB Score' type='number' ref={imdbFieldRef} inputProps={{step:'any'}}/>
                 <br />
                 <br />
-                <TextField id="outlined-popularity" label="Popularity" variant="outlined" required placeholder='Popularity' type='number' ref={this.popularityFieldRef}/>
+                <TextField id="outlined-popularity" label="Popularity" variant="outlined" required placeholder='Popularity' type='number' ref={popularityFieldRef}/>
                 <br />
                 <br />
-                <Select multiple={true} value={selected} id='outlined-genres' label='Genre' input={<Input />}
+                <Select multiple={true} value={selected} label='Genre' input={<Input id='outlined-genres'/>}
                     variant='outlined' required placeholder='Genre' renderValue={(selected) => selected.join(', ')}
-                    onChange={onChange} ref={this.selectRef}>
+                    onChange={onChange} ref={selectRef}>
                     {/* <MenuItem key={'A'} value={'A'}>
                         <Checkbox checked={true} />
                         A
@@ -101,7 +125,7 @@ export default function SimpleModal(props) {
                 </Select>
                 <br />
                 <br />
-                <Button type='button' variant='contained' color='primary' onClick={onRowSubmit.bind(this)}>Add</Button>
+                <Button type='button' variant='contained' color='primary' onClick={onRowSubmit}>Add</Button>
             </form>
         </div>
     );
@@ -121,13 +145,4 @@ export default function SimpleModal(props) {
             </Modal>
         </div>
     );
-
-    function onRowSubmit() {
-        var form = document.getElementById('row-form');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-        } else {
-            this.props.onRowSubmit();
-        }
-    }
 }
