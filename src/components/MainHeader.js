@@ -4,8 +4,6 @@ import { TextField } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import {
     BrowserRouter as Router,
-    Switch,
-    Route,
     Link
 } from "react-router-dom";
 import Typography from '@material-ui/core/Typography';

@@ -14,7 +14,6 @@ class MainScreen extends React.Component {
             chipsFilters: [],
             searchFilter: '',
             data: [],
-            // originalData: [],
             verified: false,
             genres: []
         };
@@ -72,7 +71,6 @@ class MainScreen extends React.Component {
         // this.filterChanged();
     }
     onSearch(event, data) {
-        // console.log(searchBox);
         // event.persist();
         var searchString = data;
         this.setState({

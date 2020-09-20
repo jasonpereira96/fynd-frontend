@@ -6,7 +6,6 @@ import { TextField } from '@material-ui/core';
 import { Select } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import Checkbox from '@material-ui/core/Checkbox';
-import ListItemText from '@material-ui/core/ListItemText';
 import Input from '@material-ui/core/Input';
 
 
@@ -104,18 +103,7 @@ export default function SimpleModal(props) {
                 <Select multiple={true} value={selected} label='Genre' input={<Input id='outlined-genres'/>}
                     variant='outlined' required placeholder='Genre' renderValue={(selected) => selected.join(', ')}
                     onChange={onChange} ref={selectRef}>
-                    {/* <MenuItem key={'A'} value={'A'}>
-                        <Checkbox checked={true} />
-                        A
-                    </MenuItem>
-                    <MenuItem key={'B'} value={'B'}>
-                        <Checkbox checked={true} />
-                        B
-                    </MenuItem>
-                    <MenuItem key={'C'} value={'C'}>
-                        <Checkbox checked={true} />
-                        C
-                    </MenuItem> */}
+                   
                     {genres.map((genre) => {
                         return <MenuItem key={genre} value={genre}>
                             <Checkbox checked={selected.includes(genre)} />
@@ -133,7 +121,7 @@ export default function SimpleModal(props) {
     return (
         <div>
             <Button onClick={handleOpen} color='primary' variant='contained'>
-                New Row
+                New Record
             </Button>
             <Modal
                 open={open}

@@ -5,21 +5,6 @@ import {
     TableEditColumn
 } from '@devexpress/dx-react-grid-material-ui';
 import { EditingState } from '@devexpress/dx-react-grid';
-import {
-    FilteringState,
-} from '@devexpress/dx-react-grid';
-import {
-    TableFilterRow,
-} from '@devexpress/dx-react-grid-material-ui';
-import { IntegratedSorting, SortingState } from '@devexpress/dx-react-grid';
-import { LinearProgress, Popover } from '@material-ui/core';
-import {
-    SummaryState,
-    IntegratedSummary,
-} from '@devexpress/dx-react-grid';
-import {
-    TableSummaryRow,
-} from '@devexpress/dx-react-grid-material-ui';
 import { VirtualTable } from '@devexpress/dx-react-grid-material-ui';
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
@@ -259,10 +244,6 @@ class MainGrid extends React.Component {
         };
         return commitChanges;
     }
-
-    // componentDidUpdate(prevProps) {
-    //     this.setRows(this.props.data);
-    // }
 }
 
 export default MainGrid;
