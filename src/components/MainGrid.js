@@ -5,6 +5,7 @@ import {
     TableEditColumn
 } from '@devexpress/dx-react-grid-material-ui';
 import { EditingState } from '@devexpress/dx-react-grid';
+import { IntegratedSorting, SortingState } from '@devexpress/dx-react-grid';
 import { VirtualTable } from '@devexpress/dx-react-grid-material-ui';
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
