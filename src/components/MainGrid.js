@@ -64,10 +64,10 @@ function GenreEditor({ value, onValueChange }) {
         renderValue={(selected) => selected.join(', ')}
     >
         {genres.map((genre) => (
-            <MenuItem key={genre} value={genre}>
-                <Checkbox checked={currentGenres.has(genre)} />
+            <MenuItem key={genre.id} value={genre.name}>
+                <Checkbox checked={currentGenres.has(genre.name)} />
                 {/* <Checkbox checked={personName.indexOf(name) > -1} /> */}
-                <ListItemText primary={genre} />
+                <ListItemText primary={genre.name} />
             </MenuItem>
         ))}
     </Select>;

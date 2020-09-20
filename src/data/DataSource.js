@@ -1,4 +1,9 @@
+import axios from 'axios';
+import ErrorHandler from './../components/ErrorHandler';
 class DataSource {
+    constructor() {
+        this.URL = 'http://localhost:3001';
+    }
     getData() {
         var json = [
             {
@@ -2707,6 +2712,24 @@ class DataSource {
                 "name": "Charlies Angels"
             }
         ];
+
+        /*
+        {
+                "99popularity": 83.0,
+                "director": "Victor Fleming",
+                "genre": [
+                    "Adventure",
+                    "Family",
+                    "Fantasy",
+                    "Musical"
+                ],
+                "imdb_score": 8.3,
+                "name": "The Wizard of Oz"
+            }
+        */
+        const { URL } = this;
+        return axios.get(`${URL}/data`, {}).then(response => response.data);
+
         var r = json.map((record, index) => {
             return {
                 id: index,
@@ -2734,31 +2757,56 @@ class DataSource {
             'Reality-TV'
         ];
         g.sort();
+
+        const { URL } = this;
+        return axios.get(`${URL}/genres`, {}).then(result => {
+            result.data.sort((a, b) => a.name.localeCompare(b.name));
+            return result.data;
+        });
+
         return new Promise(function (resolve, reject) {
-            resolve(g);
+            resolve(g.map((ge, index) => {
+                return {
+                    id: index,
+                    name: ge
+                };
+            }));
         });
     }
     deleteRecord(recordId) {
-
+        const { URL } = this;
+        return axios.post(`${URL}/delete`, {
+            id: recordId
+        }).then(result => result.data);
     }
     addRecord(record) {
-        return new Promise(function (resolve, reject) {
-            resolve(3000);
-        });
+        const { URL } = this;
+        // record.imdb_score = record.imdbScore;
+        // delete record.imdbScore;
+        if (Array.isArray(record.genreIds)) {
+            record.genreIds = JSON.stringify(record.genreIds);
+        }
+        return axios.post(`${URL}/add`, record).then(response => response.data);
     }
     updateRecord(recordId, fields) {
-        var ur = {
-            id: recordId,
-            name: fields.name || 'Mr. X',
-            director: fields.director || 'Jason',
-            genres: fields.genres || 'Action',
-            genre: fields.genre || ['Action'],
-            imdb_score: fields.imdb_score || 6.8,
-            popularity: fields.popularity || 68
-        };
-        return new Promise(function (resolve, reject) {
-            resolve(ur);
-        });
+        const { URL } = this;
+        const NULL = 'NULL';
+
+        const keys = ['name', 'imdb_score', 'popularity', 'genreIds', 'director'];
+
+        for (var key of keys) {
+            if (fields[key] === undefined) {
+                fields[key] = NULL;
+            }
+        }
+        fields.id = recordId;
+
+        if (fields.genreIds !== NULL) {
+            fields.genreIds = JSON.stringify(fields.genreIds);
+        }
+
+        return axios.post(`${URL}/update`, fields).then(response => response.data);
+
         /*
         99popularity: 88
         director: "George Lucas"
@@ -2771,6 +2819,13 @@ class DataSource {
         */
     }
     verifyCredentials({ username, password }) {
+        const { URL } = this;
+        return axios.post(`${URL}/credentials`, {
+            username, password
+        }).then(function (result) {
+            return result.data;
+        });
+
         return new Promise(function (resolve, reject) {
             if (username === 'admin' && password === 'admin') {
                 resolve({ valid: true });
@@ -2780,9 +2835,21 @@ class DataSource {
         });
     }
     addGenre(genre) {
+        const { URL } = this;
+
+        if (!genre || genre === '') {
+            return new Promise(function (resolve, reject) {
+                reject('invalid genre: cannot be empty');
+            });
+        }
+        return axios.post(`${URL}/addgenre`, {
+            genre: genre
+        }).then(function (response) {
+            return response.data;
+        });
         return new Promise(function (resolve, reject) {
             if (!genre) {
-                reject('invalid genre:  cannot be empty');
+                reject('invalid genre: cannot be empty');
             } else {
                 resolve({
                     result: 'genre added'
@@ -2793,6 +2860,5 @@ class DataSource {
 }
 
 export default DataSource;
-
 
 

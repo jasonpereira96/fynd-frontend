@@ -36,9 +36,9 @@ class MainScreen extends React.Component {
             me.originalData = data.slice();
             me.setState({
                 data: data,
-                chipsFilters: genres.map((genre, index) => {
+                chipsFilters: genres.map((genre) => {
                     return {
-                        value: genre, applied: false, key: index
+                        value: genre.name, applied: false, key: genre.id
                     };
                 }),
                 genres
@@ -142,7 +142,9 @@ class MainScreen extends React.Component {
             for (var record of added) {
                 var isValid = this.validate(record);
                 if (isValid) {
-                    dataSource.addRecord(record).then(id => {
+                    this.mapGernesToIds(record);
+                    dataSource.addRecord(record).then(({ movieId, added }) => {
+                        var id = movieId;
                         record.id = id;
                         let newData = this.originalData.concat(record);
                         this.originalData = newData.slice();
@@ -164,7 +166,12 @@ class MainScreen extends React.Component {
                 var record = changed[recordId];
                 var isValid = this.validateChanged(record);
                 if (isValid) {
+                    this.mapGernesToIds(record);
                     dataSource.updateRecord(recordId, record).then((updatedRecord) => {
+                        // delete record.genreIds;
+                        updatedRecord.name = updatedRecord.movie_name;
+                        delete updatedRecord.movie_name;
+                        this.mapIdstoGenres(updatedRecord);
                         var newData = this.originalData.slice();
                         for (var index = 0; index < this.originalData.length; index++) {
                             var record = this.originalData[index];
@@ -271,13 +278,38 @@ class MainScreen extends React.Component {
             currentChipFilters.push({
                 applied: false,
                 value: newGenre,
-                key: currentChipFilters.length
+                key: result.genreId
             });
             me.setState({
                 chipsFilters: currentChipFilters
             });
         });
-    } 
+    }
+    mapGernesToIds(record) {
+        var map = {};
+        for (var item of this.state.chipsFilters) {
+            let { value, key } = item;
+            var id = key;
+            map[value] = id;
+        }
+        if (record.genres) {
+            record.genreIds = record.genres.map(gerneName => map[gerneName]);
+        }
+        // delete record.genres;
+    }
+    mapIdstoGenres(record) {
+        var map = {};
+        for (var item of this.state.chipsFilters) {
+            let { value, key } = item;
+            var id = key;
+            map[id] = value;
+        }
+        if (record.genre_ids) {
+            record.genre_ids = JSON.parse(record.genre_ids);
+            record.genres = record.genre_ids.map(genreId => map[genreId]);
+        }
+        // delete record.genres;
+    }
 }
 
 export default MainScreen;
