@@ -7,7 +7,6 @@ import {
 	Link
 } from "react-router-dom";
 import MainScreen from './components/MainScreen';
-import AdminScreen from './components/AdminScreen';
 
 function App() {
 	return (
