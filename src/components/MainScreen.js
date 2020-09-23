@@ -147,6 +147,7 @@ class MainScreen extends React.Component {
                         let newData = this.originalData.concat(record);
                         this.originalData = newData.slice();
                         newData = this.runThroughFilters(newData);
+                        // newData.sort((a,b) => b.id - a.id);
 
                         this.setState({
                             data: newData
@@ -255,7 +256,13 @@ class MainScreen extends React.Component {
             }
         });
         if (appliedChipFilters.size > 0) {
-            data = data.filter(record => record.genre.some(genre => appliedChipFilters.has(genre)));
+            data = data.filter(record => {
+                if (Array.isArray(record.genre)) {
+                    return record.genre.some(genre => appliedChipFilters.has(genre))
+                } else {
+                    return record.genres.some(genre => appliedChipFilters.has(genre))
+                }
+            });
         }
         data = data.filter(record => record.name.includes(searchFilter) || record.director.includes(searchFilter));
         return data;

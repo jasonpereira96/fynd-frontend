@@ -1,8 +1,13 @@
 import axios from 'axios';
+import { API_KEY } from './constants';
 import ErrorHandler from './../components/ErrorHandler';
 class DataSource {
     constructor() {
-        this.URL = 'http://localhost:3001';
+        // this.URL = 'http://localhost/api';
+        // this.URL = 'http://localhost:5000';
+        // this.URL = 'http://jasonpereira.pagekite.me:3001';
+        // this.URL = 'http://jasonpereira.pagekite.me/api';
+        this.URL = 'https://fynd-app.herokuapp.com';
     }
     getData() {
 
@@ -21,7 +26,7 @@ class DataSource {
             }
         */
         const { URL } = this;
-        return axios.get(`${URL}/data`, {}).then(response => response.data);
+        return axios.get(`${URL}/movies`, {}).then(response => response.data);
 
     }
     getGenres() {
@@ -35,6 +40,7 @@ class DataSource {
     deleteRecord(recordId) {
         const { URL } = this;
         return axios.post(`${URL}/delete`, {
+            apiKey: API_KEY,
             id: recordId
         }).then(result => result.data);
     }
@@ -45,6 +51,7 @@ class DataSource {
         if (Array.isArray(record.genreIds)) {
             record.genreIds = JSON.stringify(record.genreIds);
         }
+        record.apiKey = API_KEY;
         return axios.post(`${URL}/add`, record).then(response => response.data);
     }
     updateRecord(recordId, fields) {
@@ -63,6 +70,7 @@ class DataSource {
         if (fields.genreIds !== NULL) {
             fields.genreIds = JSON.stringify(fields.genreIds);
         }
+        fields.apiKey = API_KEY;
 
         return axios.post(`${URL}/update`, fields).then(response => response.data);
 
@@ -94,7 +102,8 @@ class DataSource {
             });
         }
         return axios.post(`${URL}/addgenre`, {
-            genre: genre
+            genre: genre,
+            apiKey: API_KEY
         }).then(function (response) {
             return response.data;
         });
