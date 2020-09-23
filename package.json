@@ -2,6 +2,7 @@
   "name": "fynd-frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://jasonpereira96.github.io/fynd-frontend",
   "dependencies": {
     "@devexpress/dx-react-core": "^2.7.1",
     "@devexpress/dx-react-grid": "^2.7.1",
